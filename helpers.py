@@ -36,6 +36,20 @@ def interpolate_df(df):
     df = df_reindexed.interpolate(method='linear') 
     return df
 
+def istockp(s,named=False):
+    df = stock_prices(s)
+    if named:
+        return df.rename(columns = {
+            c: "{0}_{1}".format(s,c) for c in df.columns
+        })
+    else:
+        return df
+
+def msframe(*s_arr,**kwargs):
+    _filter = kwargs.get('_filter', lambda x: True)
+    df =  pd.concat([istockp(s, named=True) for s in s_arr], axis=1)
+    return df[[c for c in df.columns if _filter(c)]]
+
 
 def left_windows(series,size,offset=-1):
     as_strided = np.lib.stride_tricks.as_strided
